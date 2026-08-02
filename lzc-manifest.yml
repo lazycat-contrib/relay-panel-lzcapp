@@ -119,7 +119,7 @@ application:
 services:
   panel:
     # upstream: ghcr.io/moeshinx/relay-panel-panel:1.2.4
-    image: registry.lazycat.cloud/czyt/moeshinx/relay-panel-panel:f7ee1e450a1820f3
+    image: ghcr.1ms.run/moeshinx/relay-panel-panel:1.2.4
     environment:
       - DATABASE_URL=sqlite:/app/data/data.db?mode=rwc
       - LISTEN=0.0.0.0:18888

@@ -25,23 +25,16 @@ images:
     source: ghcr.io/moeshinx/relay-panel-panel
     channel: stable
     delivery:
-      mode: lazycat
+      mode: mirror
+      image_template: ghcr.1ms.run/moeshinx/relay-panel-panel:{tag}
+      require_digest_match: true
 
 stores:
   official:
-    enabled: true
-    skip_if_version_exists: true
-    create_if_missing: true
-    changelog_locales:
-      - zh
-      - en
+    enabled: false
+    skip_if_version_exists: false
     retry:
       enabled: false
-    application:
-      language: zh
-      name: RelayPanel
-      source: https://github.com/MoeShinX/relay-panel
-      source_author: MoeShinX
   private:
     enabled: true
     skip_if_version_exists: true
