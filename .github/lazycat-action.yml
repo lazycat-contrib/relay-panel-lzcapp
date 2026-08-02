@@ -1,0 +1,49 @@
+version: 1
+
+project:
+  root: .
+  build_config: lzc-build.yml
+  package_file: package.yml
+  output: dist/relay-panel.lpk
+  target_arch: amd64
+
+update:
+  strategy: publish
+  allow_downgrade: false
+  version_source:
+    type: image
+    image: panel
+
+build:
+  toolchains: []
+  run_buildscript: false
+
+images:
+  - id: panel
+    target: service
+    service: panel
+    source: ghcr.io/moeshinx/relay-panel-panel
+    channel: stable
+    delivery:
+      mode: lazycat
+
+stores:
+  official:
+    enabled: true
+    skip_if_version_exists: true
+    create_if_missing: true
+    changelog_locales:
+      - zh
+      - en
+    retry:
+      enabled: false
+    application:
+      language: zh
+      name: RelayPanel
+      source: https://github.com/MoeShinX/relay-panel
+      source_author: MoeShinX
+  private:
+    enabled: true
+    skip_if_version_exists: true
+    name: RelayPanel
+    summary: "RelayPanel LazyCat package published from GitHub Actions"

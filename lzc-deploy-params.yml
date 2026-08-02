@@ -1,0 +1,12 @@
+params:
+  - id: custom_domain
+    type: string
+    name: "Custom Domain"
+    description: "Optional public domain for RelayPanel, without http:// or https://. Leave empty to use the LazyCat domain."
+    optional: true
+
+locales:
+  zh:
+    custom_domain:
+      name: "自定义域名"
+      description: "RelayPanel 的可选公网域名，不要包含 http:// 或 https://；留空时使用懒猫域名。"

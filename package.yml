@@ -1,0 +1,20 @@
+package: community.lazycat.app.relay-panel
+version: 1.2.4
+name: RelayPanel
+description: "A modern relay node management panel for configuring users, forwarding rules, nodes, and traffic."
+author: MoeShinX
+license: AGPL-3.0
+homepage: https://github.com/MoeShinX/relay-panel
+min_os_version: 1.5.0
+
+permissions:
+  required:
+    - net.internet
+
+locales:
+  zh:
+    name: RelayPanel
+    description: "现代化中继节点管理面板，用于管理用户、转发规则、节点和流量。"
+  en:
+    name: RelayPanel
+    description: "A modern relay node management panel for configuring users, forwarding rules, nodes, and traffic."

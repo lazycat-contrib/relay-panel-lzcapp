@@ -1,0 +1,140 @@
+application:
+  subdomain: relay-panel
+  public_path:
+    - /
+  upstreams:
+    - location: /
+      backend: http://panel:18888/
+  injects:
+    - id: relay-panel-capture-login
+      on: request
+      auth_required: false
+      when:
+        - /api/v1/auth/login
+      do: |
+        if (String(ctx.request.method || "").toUpperCase() !== "POST") return;
+        let payload = null;
+        try {
+          payload = ctx.body.getJSON();
+        } catch {
+          payload = null;
+        }
+        if (!payload || typeof payload !== "object") return;
+        if (typeof payload.username === "string" && payload.username.length > 0) {
+          ctx.flow.set("relay-panel.pending-username", payload.username);
+        }
+        if (typeof payload.password === "string" && payload.password.length > 0) {
+          ctx.flow.set("relay-panel.pending-password", payload.password);
+        }
+
+    - id: relay-panel-commit-login
+      on: response
+      auth_required: false
+      when:
+        - /api/v1/auth/login
+      do: |
+        if (ctx.status < 200 || ctx.status >= 300) return;
+        let payload = null;
+        try {
+          payload = ctx.body.getJSON();
+        } catch {
+          payload = null;
+        }
+        if (!payload || Number(payload.code) !== 0) return;
+        const username = ctx.flow.get("relay-panel.pending-username");
+        const password = ctx.flow.get("relay-panel.pending-password");
+        if (typeof username === "string" && username.length > 0) {
+          ctx.persist.set("relay-panel.username", username);
+        }
+        if (typeof password === "string" && password.length > 0) {
+          ctx.persist.set("relay-panel.password", password);
+        }
+
+    - id: relay-panel-capture-password-change
+      on: request
+      auth_required: false
+      when:
+        - /api/v1/user/password
+      do: |
+        if (String(ctx.request.method || "").toUpperCase() !== "PUT") return;
+        let payload = null;
+        try {
+          payload = ctx.body.getJSON();
+        } catch {
+          payload = null;
+        }
+        if (!payload || typeof payload !== "object") return;
+        if (typeof payload.new_password === "string" && payload.new_password.length > 0) {
+          ctx.flow.set("relay-panel.pending-new-password", payload.new_password);
+        }
+
+    - id: relay-panel-commit-password-change
+      on: response
+      auth_required: false
+      when:
+        - /api/v1/user/password
+      do: |
+        if (ctx.status < 200 || ctx.status >= 300) return;
+        let payload = null;
+        try {
+          payload = ctx.body.getJSON();
+        } catch {
+          payload = null;
+        }
+        if (!payload || Number(payload.code) !== 0) return;
+        const password = ctx.flow.get("relay-panel.pending-new-password");
+        if (typeof password === "string" && password.length > 0) {
+          ctx.persist.set("relay-panel.password", password);
+        }
+
+    - id: relay-panel-login-autofill
+      when:
+        - /login
+      do:
+        - src: builtin://simple-inject-password
+          params:
+            user:
+              $persist: relay-panel.username
+              default: admin
+            password:
+              $persist: relay-panel.password
+              default: admin123
+            userSelector: "#username"
+            passwordSelector: "#password"
+            submitSelector: "button[type='submit']"
+
+    - id: relay-panel-current-password-autofill
+      when:
+        - /force-password-change
+      do:
+        - src: builtin://simple-inject-password
+          params:
+            password:
+              $persist: relay-panel.password
+              default: admin123
+            passwordSelector: "#current_password"
+            allowPasswordOnly: true
+            autoSubmit: false
+
+services:
+  panel:
+    # upstream: ghcr.io/moeshinx/relay-panel-panel:1.2.4
+    image: registry.lazycat.cloud/czyt/moeshinx/relay-panel-panel:f7ee1e450a1820f3
+    environment:
+      - DATABASE_URL=sqlite:/app/data/data.db?mode=rwc
+      - LISTEN=0.0.0.0:18888
+      - PUBLIC_DIR=/app/public
+      - JWT_SECRET={{ stable_secret "jwt_secret" }}
+      - PANEL_KEY={{ stable_secret "panel_key" }}
+{{ if .U.custom_domain }}
+      - PUBLIC_PANEL_URL=https://{{ .U.custom_domain }}
+{{ else }}
+      - PUBLIC_PANEL_URL=https://${LAZYCAT_APP_DOMAIN}
+{{ end }}
+      - GEOIP_ENABLED=true
+      - GEOIP_CACHE_TTL=604800
+    binds:
+      - /lzcapp/var/data:/app/data
+
+usage: |
+  首次打开时会使用上游默认账号 admin / admin123 自动登录，并提示修改默认密码；修改成功后，懒猫会自动保存新密码供后续登录使用。Node 不包含在本应用中，应部署到独立中继服务器，并在 RelayPanel 中创建入站组后使用生成的 NODE_TOKEN 接入。
