@@ -26,7 +26,6 @@ application:
         if (typeof payload.password === "string" && payload.password.length > 0) {
           ctx.flow.set("relay-panel.pending-password", payload.password);
         }
-
     - id: relay-panel-commit-login
       on: response
       auth_required: false
@@ -49,7 +48,6 @@ application:
         if (typeof password === "string" && password.length > 0) {
           ctx.persist.set("relay-panel.password", password);
         }
-
     - id: relay-panel-capture-password-change
       on: request
       auth_required: false
@@ -67,7 +65,6 @@ application:
         if (typeof payload.new_password === "string" && payload.new_password.length > 0) {
           ctx.flow.set("relay-panel.pending-new-password", payload.new_password);
         }
-
     - id: relay-panel-commit-password-change
       on: response
       auth_required: false
@@ -86,7 +83,6 @@ application:
         if (typeof password === "string" && password.length > 0) {
           ctx.persist.set("relay-panel.password", password);
         }
-
     - id: relay-panel-login-autofill
       when:
         - /login
@@ -102,7 +98,6 @@ application:
             userSelector: "#username"
             passwordSelector: "#password"
             submitSelector: "button[type='submit']"
-
     - id: relay-panel-current-password-autofill
       when:
         - /force-password-change
@@ -115,11 +110,10 @@ application:
             passwordSelector: "#current_password"
             allowPasswordOnly: true
             autoSubmit: false
-
 services:
   panel:
-    # upstream: ghcr.io/moeshinx/relay-panel-panel:1.2.4
-    image: ghcr.1ms.run/moeshinx/relay-panel-panel:1.2.4
+    # upstream: ghcr.io/moeshinx/relay-panel-panel:1.2.5
+    image: ghcr.1ms.run/moeshinx/relay-panel-panel:1.2.5
     environment:
       - DATABASE_URL=sqlite:/app/data/data.db?mode=rwc
       - LISTEN=0.0.0.0:18888
@@ -135,6 +129,5 @@ services:
       - GEOIP_CACHE_TTL=604800
     binds:
       - /lzcapp/var/data:/app/data
-
 usage: |
   首次打开时会使用上游默认账号 admin / admin123 自动登录，并提示修改默认密码；修改成功后，懒猫会自动保存新密码供后续登录使用。Node 不包含在本应用中，应部署到独立中继服务器，并在 RelayPanel 中创建入站组后使用生成的 NODE_TOKEN 接入。
