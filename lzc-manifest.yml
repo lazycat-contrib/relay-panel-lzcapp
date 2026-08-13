@@ -112,8 +112,8 @@ application:
             autoSubmit: false
 services:
   panel:
-    # upstream: ghcr.io/moeshinx/relay-panel-panel:1.2.5
-    image: ghcr.1ms.run/moeshinx/relay-panel-panel:1.2.5
+    # upstream: ghcr.io/moeshinx/relay-panel-panel:1.2.6
+    image: ghcr.1ms.run/moeshinx/relay-panel-panel:1.2.6
     environment:
       - DATABASE_URL=sqlite:/app/data/data.db?mode=rwc
       - LISTEN=0.0.0.0:18888
