@@ -1,5 +1,5 @@
 package: community.lazycat.app.relay-panel
-version: 1.2.6
+version: 1.2.7
 name: RelayPanel
 description: "A modern relay node management panel for configuring users, forwarding rules, nodes, and traffic."
 author: MoeShinX
