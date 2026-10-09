@@ -3,7 +3,7 @@ version: 1.2.12
 name: RelayPanel
 description: "A modern relay node management panel for configuring users, forwarding rules, nodes, and traffic."
 author: MoeShinX
-license: AGPL-3.0
+license: Apache-2.0
 homepage: https://github.com/MoeShinX/relay-panel
 min_os_version: 1.5.0
 permissions:
